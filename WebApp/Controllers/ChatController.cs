@@ -68,21 +68,6 @@ namespace WebApp.Controllers
 
         public IActionResult NormalConsultantView()
         {
-            InitialForm form2 = new InitialForm()
-            {
-                Age = 20,
-                ContactWithSuspect = true,
-                ContactWithUnacquainted = true,
-                CoughNBreathProblems = true,
-                HaveAnyOfDiseases = true,
-                HighTemperature = true,
-                IfPersonTravelled = true,
-                IfReceiveImmunosuppressiveMed = true,
-                Name = "Wojtek",
-                PESEL = "921413412",
-                Surname = "Roz"
-            };
-
             return View();
         }
 
