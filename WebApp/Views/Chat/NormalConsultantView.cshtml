@@ -242,6 +242,7 @@
             $('#chat').removeClass("chat");
             $('#chat').hide();
             $('#usersDiv').show();
+            $('#startChat').prop('disabled', true);
 
             connection.invoke('EnableDetailedFormFill', selectedPersonId, true);
             connection.invoke('FinishConversation', selectedPersonId);

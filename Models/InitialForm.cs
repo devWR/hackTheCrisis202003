@@ -24,7 +24,6 @@ namespace Models
         [Required(ErrorMessage = "Proszę wybrać jedną z opcji!")]
         public bool? HaveAnyOfDiseases { get; set; }
 
-
         [Required(ErrorMessage = "Proszę wybrać jedną z opcji!")]
         public bool? IfReceiveImmunosuppressiveMed { get; set; }
 

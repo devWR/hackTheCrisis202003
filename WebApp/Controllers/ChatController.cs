@@ -27,7 +27,6 @@ namespace WebApp.Controllers
         public IActionResult ContactingPersonViewDetailedForm()
         {
             DetailedForm form = JsonConvert.DeserializeObject<DetailedForm>((string)TempData["Form"]);
-
             return View(form);
         }
 

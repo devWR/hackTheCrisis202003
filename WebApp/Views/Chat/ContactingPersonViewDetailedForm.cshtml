@@ -5,15 +5,32 @@
     <div class="row no-gutters">
         <div class="col-md-6 no-gutters">
             <div class="leftSide">
-                @*@if (Model == Models.Enum.InitialDiagnosisResult.Positive)
-                    {
-                        @await Component.InvokeAsync("PositiveInitialResult")
-                    }
-                    else
-                    {
-                        @await Component.InvokeAsync("NegativeInitialResult")
-                    }*@
-                @await Component.InvokeAsync("PositiveInitialResult")
+                @if ((Model.HighTemperature.HasValue && Model.HighTemperature.Value) || (Model.CoughNBreathProblems.HasValue && Model.CoughNBreathProblems.Value))
+                {
+                    <p style="text-align: justify">Masz duże szanse bycia zarażonym wirusem COVID-19.</p>
+                    <br />
+                    <p style="text-align: justify">Proszę skontaktować się z naszym konsultantem, który dokona dokładniejszej diagnozy i poda Panu(i) więcej informacji.</p>
+                }
+                else if ((Model.IfPersonTravelled.HasValue && Model.IfPersonTravelled.Value) || (Model.ContactWithSuspect.HasValue && Model.ContactWithSuspect.Value))
+                {
+                    <p style="text-align: justify">
+                        Masz szanse bycia zainfekowanym wirusem COVID-19. Zalecamy Ci zachować czujność i obserwować objawy.
+                        W razie nasilenia się objawów skontaktuj się z nami ponownie.
+                    </p>
+                    <p style="text-align: justify">
+                        Jeżeli chorujesz na jakąś chorobę płuc czy serca, cukrzycę lub przewlekłą chorobę nerek zalecamy zachować jeszcze większą ostrożność.
+                    </p>
+                    <br />
+                    <p style="text-align: justify">W razie pytań proszę skontaktować się z naszym konsultantem.</p>
+                }
+                else
+                {
+                    <p style="text-align: justify">
+                        Wydaje się, że ma Pan(i) małe szanse bycia zarażonym wirusem COVID-19.
+                    </p>
+                    <br />
+                    <p style="text-align: justify">W razie pytań proszę skontaktować się z naszym konsultantem.</p>
+                }
                 <br />
                 <div id="detailedFormHiperLink" style="display: none">
                     <label>Po wciśnięciu poniższego przycisku zostaniesz przeniesiony(a) do nowej strony, na której znajdziesz formularz do wypełnienia.</label>
