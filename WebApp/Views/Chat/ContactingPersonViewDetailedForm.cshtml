@@ -1,0 +1,208 @@
+﻿@model Models.DetailedForm
+
+<section class="py-2">
+    @Html.Hidden("hidden", Newtonsoft.Json.JsonConvert.SerializeObject(Model), new { @id = "modelField" })
+    <div class="row no-gutters">
+        <div class="col-md-6 no-gutters">
+            <div class="leftSide">
+                @*@if (Model == Models.Enum.InitialDiagnosisResult.Positive)
+                    {
+                        @await Component.InvokeAsync("PositiveInitialResult")
+                    }
+                    else
+                    {
+                        @await Component.InvokeAsync("NegativeInitialResult")
+                    }*@
+                @await Component.InvokeAsync("PositiveInitialResult")
+                <br />
+                <div id="detailedFormHiperLink" style="display: none">
+                    <label>Po wciśnięciu poniższego przycisku zostaniesz przeniesiony(a) do nowej strony, na której znajdziesz formularz do wypełnienia.</label>
+                    @Html.ActionLink("Przejdź do formularza.", "DetailedForm", "QuestionForm", new { form = Model })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 no-gutters">
+            <div class="rightSide">
+                <div id="buttonDiv" class="row mt-4">
+                    <button onclick="continueToChat()" class="btn btn-info">Rozpoczynij czat</button>
+                </div>
+                <div id="pleaseWaitLblDiv" class="row mt-4" style="display: none">
+                    @Html.Label("", "Proszę czekać na konsultanta..")
+                </div>
+
+                <div id="chat" style="display: none">
+                    <ul id="messages"></ul>
+
+                    <form id="frm-send-message" action="#" autocomplete="off" class="bottonChatPart">
+                        <input type="text" id="message" placeholder="Napisz wiadomość" />
+                        <input type="submit" id="send" value="Wyślij" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+
+<script>
+
+    var consultantConnId = null;
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chat")
+        .build();
+
+    document.getElementById('frm-send-message').addEventListener('submit', event => {
+
+        SendMessage();
+        event.preventDefault();
+    });
+
+    function SendMessage() {
+
+        let message = $('#message').val();
+        let nick = "@(Model.Name)" + " " + "@(Model.Surname)";
+
+        if (message.length == 0)
+            return;
+
+        $('#message').val('');
+
+        connection.invoke('SendTo', consultantConnId, nick, message);
+        appendLine(nick, message);
+    }
+
+    function continueToChat() {
+
+        connection.start()
+            .catch(function (err) {
+
+                console.error(err.toString());
+                setTimeout(function () {
+                    continueToChat();
+                }, 1000);
+            }).then(function () {
+
+                console.log("Hub connected!");
+
+                connection.on('receiveConnId', (connId) => {
+
+                    AddPersonToAwaitingQueue(connId);
+                });
+
+                connection.invoke('ReceiveConnId');
+
+                connection.on('send', (nick, message) => {
+                    appendLine(nick, message);
+                });
+
+                connection.on('conversationFinished', () => {
+
+                    consultantConnId = null;
+                    $('#pleaseWaitLblDiv').hide();
+                    $('#chat').removeClass("chat");
+                    $('#chat').hide();
+                    $('#buttonDiv').show();
+                    connection.stop();
+                });
+
+                connection.on('receiveConsultantConnId', (connId) => {
+
+                    consultantConnId = connId;
+                    $('#pleaseWaitLblDiv').hide();
+                    $('#chat').show();
+                    $('#chat').addClass("chat");
+                });
+            });
+
+        $('#buttonDiv').hide();
+        $('#pleaseWaitLblDiv').show();
+    }
+
+
+    function AddPersonToAwaitingQueue(userId) {
+
+        try {
+            var _url = "@Url.Action("AddToChatQueueDetailed")";
+            var model = $("#modelField").val();
+
+            $.ajax({
+                url: _url,
+                cache: false,
+                data: { userId: userId, form: JSON.parse(model) },
+                type: 'POST',
+                success: function (result) {
+
+
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+        catch (ex) {
+            console.error(ex);
+        }
+    }
+
+    function appendLine(nick, message, color) {
+
+        let nameElement = document.createElement('strong');
+        nameElement.innerText = `${nick}:`;
+
+        let msgElement = document.createElement('em');
+        msgElement.innerText = ` ${message}`;
+
+        let li = document.createElement('li');
+        li.appendChild(nameElement);
+        li.appendChild(msgElement);
+
+        $('#messages').append(li);
+    };
+
+</script>
+
+<style>
+    .leftSide, .rightSide {
+        height: 500px;
+        width: 100%;
+    }
+
+    .leftSide {
+        padding: 0 40px 0 0;
+    }
+
+    .rightSide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -moz-box-shadow: 0 0 3px #ccc;
+        -webkit-box-shadow: 0 0 3px #ccc;
+        box-shadow: 0 0 3px #ccc;
+    }
+
+    .bottonChatPart {
+        width: 100%;
+        position: absolute;
+        display: inline-block;
+        bottom: 0;
+        left: 0;
+    }
+
+        .bottonChatPart #message {
+            width: 70%;
+            float: left;
+        }
+
+        .bottonChatPart #send {
+            width: 30%;
+            float: right;
+        }
+
+    #messages {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+</style>

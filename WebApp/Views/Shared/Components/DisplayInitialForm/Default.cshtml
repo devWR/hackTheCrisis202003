@@ -1,0 +1,109 @@
+﻿@model Models.InitialForm
+
+<section id="breadcrumb" class="py-2">
+    <h2 style="text-align: center">
+        @Model.Name @Model.Surname (@Model.Age lat(a))
+    </h2>
+    <p style="text-align: center">Pesel: @Model.PESEL</p>
+    <hr width="100%" />
+
+    <div class="container">
+        <div class="full-form">
+            <div class="form-group col-md-10 my-0 pt-5">
+                @Html.Label("", "Czy cierpi na którąś z poniższych chorób?")
+                <ul type="circle">
+                    @foreach (string disease in Models.Global.DiseaseList)
+                    {
+                        <li>@disease</li>
+                    }
+                </ul>
+
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.HaveAnyOfDiseases, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.HaveAnyOfDiseases, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-10 my-0 pt-5">
+                @Html.Label("", "Czy przyjmuje leki immunosupresyjne?")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.IfReceiveImmunosuppressiveMed, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.IfReceiveImmunosuppressiveMed, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-8 my-0 pt-5">
+                @Html.Label("", "Czy ma gorączkę (temperaturę powyżej +37.3°C) lub czy jej doświadczył(a) w przeciągu ostatnich 14 dni?")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.HighTemperature, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.HighTemperature, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-8 my-0 pt-5">
+                @Html.Label("", "Czy w przeciągu ostatnich 14 dni miał(a) kaszel lub objawy duszności?")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.CoughNBreathProblems, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.CoughNBreathProblems, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-10 my-0 pt-5">
+                @Html.Label("", "Czy w ciągu ostatnich 14 dni podróżował(a) za granicę?")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.IfPersonTravelled, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.IfPersonTravelled, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-10 my-0 pt-5">
+                @Html.Label("", "Czy w ciągu ostatnich 14 dni miał(a) kontakt z osobą, która przyjechała z zagranicy, bądź miała gorączkę lub objawy duszności?")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.ContactWithSuspect, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.ContactWithSuspect, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+
+        <div class="full-form">
+            <div class="form-group col-md-10 my-0 pt-5">
+                @Html.Label("", "Czy przebywał(a) ostatnio w miejscach, w których miał(a) bliski kontakt z nieznanymi osobami")
+            </div>
+            <div class="form-group col-md-3 my-0 pt-3">
+                @Html.RadioButtonFor(o => o.ContactWithUnacquainted, true, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Tak")
+            </div>
+
+            <div class="form-group col-md-3 my-0 pt-1">
+                @Html.RadioButtonFor(o => o.ContactWithUnacquainted, false, new { @class = "radioButton", @disabled = "disabled" }) @Html.Label("Nie")
+            </div>
+        </div>
+    </div>
+</section>

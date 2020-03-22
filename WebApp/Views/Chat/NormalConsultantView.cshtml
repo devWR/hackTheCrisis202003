@@ -1,0 +1,319 @@
+﻿
+<section class="py-2">
+    <div class="row no-gutters">
+        <div class="col-md-6 no-gutters">
+            <div id="formViewDiv" class="leftSide">
+            </div>
+        </div>
+        <div class="col-md-6 no-gutters">
+            <div class="rightSide">
+                <div id="usersDiv" class="row mt-4">
+                    <div class="full-form">
+                        <div id="userListDiv" style="width: 100%"></div>
+                        <div class="form-group col-md-7 my-0 pt-1">
+                            <button id="startChat" onclick="continueToChat()" class="btn btn-info" disabled>Rozpoczynij czat</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chat" style="display: none">
+                    <button id="enableDetailedFormBtn" type="button" onclick="EnableDetailedForm()">Odblokuj możliwość wypełnienia szczegółowego formularza.</button>
+                    <button id="exitBtn" type="button" onclick="FinishConversation(false)">Zakończ</button>
+                    <ul id="messages"></ul>
+
+                    <form id="frm-send-message" action="#" autocomplete="off" class="bottonChatPart">
+                        <input type="text" id="message" placeholder="Napisz wiadomość" />
+                        <input type="submit" id="send" value="Wyślij" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+
+<script>
+
+    var selectedPersonId = null;
+    var myId = null;
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chat")
+        .build();
+
+    document.getElementById('frm-send-message').addEventListener('submit', event => {
+
+        SendMessage();
+        event.preventDefault();
+    });
+
+    window.addEventListener("unload", function () {
+        FinishConversation(true);
+    });
+
+    function SendMessage() {
+
+        if (selectedPersonId == null)
+            return;
+
+        let message = $('#message').val();
+        let nick = "Konsultant";
+
+        if (message.length == 0)
+            return;
+
+        $('#message').val('');
+
+        connection.invoke('sendTo', selectedPersonId, nick, message);
+        appendLine(nick, message);
+    }
+
+    function continueToChat() {
+        connection.start()
+            .catch(function (err) {
+
+                console.error(err.toString());
+                setTimeout(function () {
+                    continueToChat();
+                }, 1000);
+            }).then(function () {
+
+                console.log("Hub connected!");
+
+                connection.on('receiveConnId', (connId) => {
+
+                    myId = connId;
+                    MarkUserAsOcupated(selectedPersonId, myId);
+                    connection.invoke('SendConsultantId', selectedPersonId, myId);
+                });
+
+                connection.invoke('ReceiveConnId');
+
+                connection.on('send', (nick, message) => {
+                    appendLine(nick, message);
+                });
+            });
+
+        $('#usersDiv').hide();
+        $('#chat').show();
+        $('#chat').addClass("chat");
+    }
+
+    function appendLine(nick, message, color) {
+
+        let nameElement = document.createElement('strong');
+        nameElement.innerText = `${nick}:`;
+
+        let msgElement = document.createElement('em');
+        msgElement.innerText = ` ${message}`;
+
+        let li = document.createElement('li');
+        li.appendChild(nameElement);
+        li.appendChild(msgElement);
+
+        $('#messages').append(li);
+    };
+
+    function GetAwaitingUsers() {
+
+        var selectedId = "0";
+
+        try {
+            var radioButtons = $("input[name=user]:checked");
+
+            if (radioButtons.length > 0) {
+                selectedId = $("input[name=user]:checked").val();
+            }
+        }
+        catch (ex) {
+            console.log(ex);
+        };
+
+        var _url = "@Url.Action("GetAllNotOcupatedUsers")";
+        _url = _url + "?selectedId=" + selectedId;
+
+        $.ajax({
+            url: _url,
+            cache: false,
+            type: 'GET',
+            success: function (result) {
+
+                ShowNotOcupatedUsers(result);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function ShowNotOcupatedUsers(users) {
+
+        $("#userListDiv").empty();
+
+        if (users != null) {
+
+            for (var i = 0; i < users.length; i++) {
+
+                var radioButton = "<input type='radio' id='" + users[i].value + "' value='" + users[i].value + "' name='user'";
+
+                if (users[i].selected)
+                    radioButton += " checked='checked'";
+
+
+                radioButton += " onchange='RadioButtonClicked(this);' style='margin: 5px 15px 2px 5px'>";
+
+                var labelForRButton = "<label for='" + users[i].value + "'>" + users[i].text + "</label> <br/>";
+
+                $("#userListDiv").empty();
+                $("#userListDiv").append(radioButton);
+                $("#userListDiv").append(labelForRButton);
+            }
+        }
+    }
+
+    function RadioButtonClicked(button) {
+
+        selectedPersonId = button.value;
+        var _url = "@Url.Action("GetInitialFormFor")";
+        _url = _url + "?userId=" + selectedPersonId;
+
+        $.ajax({
+            url: _url,
+            cache: false,
+            type: 'GET',
+            success: function (result) {
+
+                $('#startChat').prop('disabled', false);
+                $('#formViewDiv').append(result);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function MarkUserAsOcupated(selectedUserId, consultantId) {
+
+        var _url = "@Url.Action("MarkAsOcupated")";
+        _url = _url + "?userId=" + selectedUserId + "&consultantId=" + consultantId;
+
+        $.ajax({
+            url: _url,
+            cache: false,
+            type: 'GET',
+            success: function (result) {
+
+            },
+            error: function (error) {
+                console.log(error);
+                $('#startChat').prop('disabled', true);
+                $('#chat').removeClass("chat");
+                $('#chat').hide();
+                $('#usersDiv').show();
+            }
+        });
+    }
+
+    function FinishConversation(ifConfirmed) {
+
+        var result = ifConfirmed || confirm('Czy na pewno chcesz zakończyć rozmowę?');
+
+        if (result) {
+
+            $('#chat').removeClass("chat");
+            $('#chat').hide();
+            $('#usersDiv').show();
+
+            connection.invoke('FinishConversation', selectedPersonId);
+            connection.stop();
+
+            selectedPersonId = null;
+            myId = null;
+        }
+    }
+
+    function EnableDetailedForm() {
+
+        var result = confirm('Po odblokwaniu przycisku ten czat zostanie zamknięty!');
+
+        if (result) {
+
+            $('#chat').removeClass("chat");
+            $('#chat').hide();
+            $('#usersDiv').show();
+
+            connection.invoke('EnableDetailedFormFill', selectedPersonId, true);
+            connection.invoke('FinishConversation', selectedPersonId);
+            connection.stop();
+
+            selectedPersonId = null;
+            myId = null;
+        }
+    }
+
+    setInterval(GetAwaitingUsers, 1000);
+
+</script>
+
+<style>
+    .leftSide, .rightSide {
+        height: 500px;
+        width: 100%;
+    }
+
+    .leftSide {
+        padding: 0 40px 0 0;
+        overflow: auto;
+    }
+
+    .rightSide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -moz-box-shadow: 0 0 3px #ccc;
+        -webkit-box-shadow: 0 0 3px #ccc;
+        box-shadow: 0 0 3px #ccc;
+    }
+
+    .bottonChatPart {
+        width: 100%;
+        position: absolute;
+        display: inline-block;
+        bottom: 0;
+        left: 0;
+    }
+
+        .bottonChatPart #message {
+            width: 70%;
+            float: left;
+        }
+
+        .bottonChatPart #send {
+            width: 30%;
+            float: right;
+        }
+
+    #messages {
+        width: 100%;
+        position: absolute;
+        top: 5%;
+        left: 0;
+    }
+
+    #exitBtn {
+        width: 20%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: lightgray;
+    }
+
+    #enableDetailedFormBtn {
+        width: 80%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: lightgray;
+    }
+</style>

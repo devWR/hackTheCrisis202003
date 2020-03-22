@@ -1,0 +1,287 @@
+﻿@model Models.DetailedForm
+
+<section class="py-2">
+    <h2 style="text-align: center">
+        Proszę wypełnić poniższy formularz
+    </h2>
+
+    <hr width="100%" />
+    <br />
+
+    @using (Html.BeginForm("ApplyDetailedForm", "QuestionForm", FormMethod.Post, new { @autocomplete = "off" }))
+    {
+        @Html.ValidationSummary(true, string.Empty, new { @class = "alert alert-danger" }, "div")
+        <div class="container">
+            <div class="form-row">
+                <div class="col-md-offset-1 col-md-12">
+                    <div class="form-group form-inline">
+                        <div class="form-group col-md-2 my-0 pt-1">
+                            @Html.DisplayNameFor(o => o.Name)
+                        </div>
+                        <div class="form-group col-md-3 my-0 pt-1">
+                            @Html.TextBoxFor(o => o.Name, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-7 my-0 pt-1">
+                            @Html.ValidationMessageFor(o => o.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-offset-1 col-md-12">
+                    <div class="form-group form-inline">
+                        <div class="form-group col-md-2 my-0 pt-1">
+                            @Html.DisplayNameFor(o => o.Surname)
+                        </div>
+                        <div class="form-group col-md-3 my-0 pt-1">
+                            @Html.TextBoxFor(o => o.Surname, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-7 my-0 pt-1">
+                            @Html.ValidationMessageFor(o => o.Surname, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-offset-1 col-md-12">
+                    <div class="form-group form-inline">
+                        <div class="form-group col-md-2 my-0 pt-1">
+                            @Html.DisplayNameFor(o => o.Age)
+                        </div>
+                        <div class="form-group col-md-3 my-0 pt-1">
+                            @Html.TextBoxFor(o => o.Age, new { @type = "number", @class = "form-control", @min = 0 })
+                        </div>
+                        <div class="form-group col-md-7 my-0 pt-1">
+                            @Html.ValidationMessageFor(o => o.Age, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-offset-1 col-md-12">
+                    <div class="form-group form-inline">
+                        <div class="form-group col-md-2 my-0 pt-1">
+                            @Html.DisplayNameFor(o => o.PESEL)
+                        </div>
+                        <div class="form-group col-md-3 my-0 pt-1">
+                            @Html.TextBoxFor(o => o.PESEL, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-7 my-0 pt-1">
+                            @Html.ValidationMessageFor(o => o.PESEL, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.Label("", "Czy cierpisz na któryś z poniższych problemów? Jeśli tak to podaj konkretną nazwę choroby.")
+                    <ul type="circle">
+                        @foreach (string disease in Models.Global.DiseaseList)
+                        {
+                            <li>
+                                <div class="col-md-offset-1 col-md-12">
+                                    <div class="form-group form-inline">
+                                        <div class="form-group col-md-2 my-0 pt-1">
+                                            @disease
+                                        </div>
+                                        <div class="form-group col-md-3 my-0 pt-1">
+                                            @if (disease.Contains("płuc"))
+                                            {
+                                                @Html.TextBoxFor(o => o.LungDisease, new { @class = "form-control" })
+                                            }
+                                            else if (disease.Contains("serca"))
+                                            {
+                                                @Html.TextBoxFor(o => o.HeartDisease, new { @class = "form-control" })
+                                            }
+                                            else if (disease.Contains("nerek"))
+                                            {
+                                                @Html.TextBoxFor(o => o.ChronicKidneyDisease, new { @class = "form-control" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.HaveAnyOfDiseases, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.HaveAnyOfDiseases, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.HaveAnyOfDiseases, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.Label("", "Czy przyjmujesz leki immunosupresyjne?")
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.IfReceiveImmunosuppressiveMed, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.IfReceiveImmunosuppressiveMed, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.IfReceiveImmunosuppressiveMed, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-8 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.HighTemperature)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.HighTemperature, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.HighTemperature, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.HighTemperature, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-8 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.CoughNBreathProblems)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.CoughNBreathProblems, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.CoughNBreathProblems, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.CoughNBreathProblems, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.SymptomsWhichPersonExperienced)
+                    <ul type="circle">
+                        @foreach (string disease in Models.Global.SymptomsList)
+                        {
+                            <li> @disease </li>
+                        }
+                    </ul>
+
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.TextBoxFor(o => o.SymptomsWhichPersonExperienced, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.AreYouPregnant)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.AreYouPregnant, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.AreYouPregnant, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.AreYouPregnant, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.CancerTreated)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.CancerTreated, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.CancerTreated, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.CancerTreated, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.IfPersonTravelled)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.IfPersonTravelled, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.IfPersonTravelled, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.IfPersonTravelled, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.ContactWithSuspect)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.ContactWithSuspect, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.ContactWithSuspect, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.ContactWithSuspect, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+            <div class="full-form">
+                <div class="form-group col-md-10 my-0 pt-5">
+                    @Html.DisplayNameFor(o => o.ContactWithUnacquainted)
+                </div>
+                <div class="form-group col-md-7 my-0 pt-1">
+                    @Html.ValidationMessageFor(o => o.ContactWithUnacquainted, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group col-md-3 my-0 pt-3">
+                    @Html.RadioButtonFor(o => o.ContactWithUnacquainted, true, new { @class = "radioButton" }) @Html.Label("Tak")
+                </div>
+
+                <div class="form-group col-md-3 my-0 pt-1">
+                    @Html.RadioButtonFor(o => o.ContactWithUnacquainted, false, new { @class = "radioButton" }) @Html.Label("Nie")
+                </div>
+            </div>
+
+
+            <div class="row mt-4">
+                <input type="submit" value="Kontynuuj" class="btn btn-info" />
+            </div>
+        </div>
+    }
+</section>
+
+<style>
+    .radioButton {
+        margin: 0 1em 1em 1em;
+        transform: scale(1.3, 1.3);
+        -moz-transform: scale(1.3, 1.3);
+        -ms-transform: scale(1.3, 1.3);
+        -webkit-transform: scale(1.3, 1.3);
+        -o-transform: scale(1.3, 1.3);
+    }
+
+    .input-validation-error {
+        background-color: #ffeeee;
+        outline: 1px solid #ff0000;
+    }
+</style>
