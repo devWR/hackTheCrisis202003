@@ -31,28 +31,13 @@ namespace WebApp.Controllers
         {
             try
             {
-                //if (!ModelState.IsValid)
-                //{
-                //    return View("Index", form);
-                //}
-
-
-                var form2 = new InitialForm()
+                if (!ModelState.IsValid)
                 {
-                    Age = 20,
-                    ContactWithSuspect = true,
-                    ContactWithUnacquainted = true,
-                    CoughNBreathProblems = true,
-                    HaveAnyOfDiseases = true,
-                    HighTemperature = true,
-                    IfPersonTravelled = true,
-                    IfReceiveImmunosuppressiveMed = true,
-                    Name = "Wojtek",
-                    PESEL = "921413412",
-                    Surname = "Roz"
-                };
-                TempData["Form"] = JsonConvert.SerializeObject(form2);
-                return RedirectToAction("ContactingPersonView", "Chat", new { form = JsonConvert.SerializeObject(form2) });
+                    return View("Index", form);
+                }
+
+                TempData["Form"] = JsonConvert.SerializeObject(form);
+                return RedirectToAction("ContactingPersonView", "Chat");
             }
             catch (Exception e)
             {
